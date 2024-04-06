@@ -55,11 +55,11 @@ namespace Library.BLL.Services
             return _bookRepo.ReturnBook(userId, bookId);
         }
 
-        public List<BookDto> SearchBooks(string query)
+        public List<Books> SearchBooks(string query)
         {
             if (string.IsNullOrEmpty(query))
             {
-                throw new ArgumentException("Search query cannot be empty.");
+                return _bookRepo.GetAll("Books").ToList();
             }
             var booksToReturn= _bookRepo.SearchBooksByTitleOrAuthor(query.ToLower());
             return booksToReturn;

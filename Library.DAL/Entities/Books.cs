@@ -17,6 +17,7 @@ namespace Library.DAL.Entities
         public string Author { get; set; }
         public string Genre { get; set; }
         public string ISBN { get; set; }
+        public string Image { get; set; }
         public int TotalCopies { get; set; }
         public int AvailableCopies { get; set; }
     }

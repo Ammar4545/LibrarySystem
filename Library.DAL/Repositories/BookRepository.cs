@@ -154,14 +154,14 @@ namespace Library.DAL.Repositories
 
             return borrowedBooks;
         }
-        public List<BookDto> SearchBooksByTitleOrAuthor(string searchQuery)
-        {
-            var books = new List<BookDto>();
+        public List<Books> SearchBooksByTitleOrAuthor(string searchQuery)
+            {
+            var books = new List<Books>();
             using (SqlConnection conn = new SqlConnection(_connection.SQLString))
             {
                 conn.Open();
                 string sql = @"
-                    SELECT BookId, Title, Author, Genre, ISBN
+                    SELECT BookId, Title, Author, Genre, ISBN, Image
                     FROM Books
                     WHERE Title LIKE @SearchQuery OR Author LIKE @SearchQuery";
 
@@ -172,21 +172,22 @@ namespace Library.DAL.Repositories
                     {
                         while (reader.Read())
                         {
-                            var book = new BookDto
+                            var book = new Books
                             {
                                 BookId = reader.GetInt32(reader.GetOrdinal("BookId")), // Assuming this is not nullable
                                 Title = reader.IsDBNull(reader.GetOrdinal("Title")) ? null : reader.GetString(reader.GetOrdinal("Title")),
                                 Author = reader.IsDBNull(reader.GetOrdinal("Author")) ? null : reader.GetString(reader.GetOrdinal("Author")),
                                 Genre = reader.IsDBNull(reader.GetOrdinal("Genre")) ? null : reader.GetString(reader.GetOrdinal("Genre")),
                                 ISBN = reader.IsDBNull(reader.GetOrdinal("ISBN")) ? null : reader.GetString(reader.GetOrdinal("ISBN")),
+                                Image = reader.IsDBNull(reader.GetOrdinal("Image")) ? null : reader.GetString(reader.GetOrdinal("Image")),
                             };
                             books.Add(book);
                         }
                     }
                 }
             }
-            return books;
-        }
+                return books;
+            }
         public int Update(Books book)
         {
             using (SqlConnection conn = new SqlConnection(_connection.SQLString))

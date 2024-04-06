@@ -10,6 +10,9 @@ using Library.PL.Data;
 using Microsoft.AspNetCore.Authorization;
 using Library.BLL.Services.Contracts;
 using Library.BLL.Services;
+using Microsoft.AspNetCore.Hosting;
+using Library_Utility;
+using Library.PL.ViewModel;
 
 namespace Library.PL.Controllers
 {
@@ -17,10 +20,11 @@ namespace Library.PL.Controllers
     public class BooksController : Controller
     {
         private readonly IBookService _bookService;
-
-        public BooksController(IBookService bookService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public BooksController(IBookService bookService, IWebHostEnvironment webHostEnvironment)
         {
             _bookService = bookService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         // GET: Books
@@ -59,16 +63,30 @@ namespace Library.PL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create
-            ([Bind("BookId,Title,Author,Genre,ISBN,TotalCopies,AvailableCopies")] Books books)
+        public IActionResult Create( Books books)
         {
-            if (ModelState.IsValid)
-            {
-                _bookService.Add(books,"Books");
-             
-                return RedirectToAction(nameof(Index));
-            }
-            return View(books);
+            //var errors = ModelState
+            //     .Where(x => x.Value.Errors.Count > 0)
+            //     .Select(x => new { x.Key, x.Value.Errors })
+            //     .ToArray();            
+             var file = HttpContext.Request.Form.Files;
+             string webRootPath = _webHostEnvironment.WebRootPath;
+
+             string uplaod = webRootPath + GlobalConst.ImagePath;
+             string filename = Guid.NewGuid().ToString();
+             string extention = Path.GetExtension(file[0].FileName);
+
+             using (var filestream = new FileStream(Path.Combine(uplaod, filename + extention), FileMode.Create))
+             {
+                 file[0].CopyTo(filestream);
+             }
+             books.Image = filename + extention;
+
+             _bookService.Add(books,"Books");
+            
+             return RedirectToAction(nameof(Index));
+            
+            //return View(books);
         }
 
         // GET: Books/Edit/5
@@ -152,7 +170,8 @@ namespace Library.PL.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
+        public IActionResult BorrowBook()
+        
         private bool BooksExists(int id)
         {
             if (_bookService.GetById("Books", id)!=null)

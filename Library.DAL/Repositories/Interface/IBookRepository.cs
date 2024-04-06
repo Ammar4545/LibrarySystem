@@ -14,7 +14,7 @@ namespace Library.DAL.Repositories.Interface
         bool BorrowBook(int userId, int bookId);
         bool ReturnBook(int userId, int bookId);
         List<BorrowedBook> GetBorrowedBooksByUser(string userName);
-        List<BookDto> SearchBooksByTitleOrAuthor(string searchQuery);
+        List<Books> SearchBooksByTitleOrAuthor(string searchQuery);
         int Update(Books entity);
     }
 }

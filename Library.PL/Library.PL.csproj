@@ -19,6 +19,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Library.BLL\Library.BLL.csproj" />
+    <ProjectReference Include="..\Library_Utility\Library_Utility.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\images\books\" />
+    <Folder Include="wwwroot\fonts\" />
   </ItemGroup>
 
 </Project>

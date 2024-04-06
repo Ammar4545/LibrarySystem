@@ -19,7 +19,9 @@ namespace Library.BLL.Services.Contracts
         bool BorrowBook(int userId, int bookId);
         bool ReturnBook(int userId, int bookId);
         List<BorrowedBook> GetBorrowedBooksByUser(string userName);
-        List<BookDto> SearchBooks(string query);
-        
+        List<Books> SearchBooks(string query);
+       
+
+
     }
 }
