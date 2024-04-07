@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.BLL", "Library.BLL\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library.DAL", "Library.DAL\Library.DAL.csproj", "{4744834B-E512-4005-9DC6-28660CF162FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Library_Utility", "Library_Utility\Library_Utility.csproj", "{6ACFE9A8-AD30-445A-9161-814962798798}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Library_Utility", "Library_Utility\Library_Utility.csproj", "{6ACFE9A8-AD30-445A-9161-814962798798}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A3244280-3304-4FA1-B4CC-D4825F9986A4}"
+	ProjectSection(SolutionItems) = preProject
+		SqlQuery_1.sql = SqlQuery_1.sql
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

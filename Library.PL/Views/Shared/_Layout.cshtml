@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject IHttpContextAccessor httpContextAccessor;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -24,18 +25,43 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
-                    <ul class="navbar-nav">
-                        <partial name="_loginPartial" ></partial>
                        @*  <li class="nav-item">
-                            <a class="nav-link text-dark" id="register" asp-area="Identity" asp-page="/Account/Register">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" id="login" asp-area="Identity" asp-page="/Account/Login">Login</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li> *@
+                        
+                        @if (httpContextAccessor.HttpContext.Session.GetString("userName") == "admin")
+                        {
+                           @*  <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Dropdown button
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="nav-link text-dark dropdown-item" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
+                                    <a class="nav-link text-dark dropdown-item" asp-area="" asp-controller="Users" asp-action="Index"> Users </a>
+                                    
+                                </div>
+                            </div> *@
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Library Management
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="nav-link text-dark dropdown-item" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
+                                <a class="nav-link text-dark dropdown-item" asp-area="" asp-controller="Users" asp-action="Index"> Users </a>
+                                <div class="dropdown-divider"></div>
+                                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Create Admin User</a>
+                                 </div>
+                          </li>
+                        }
+                    </ul> 
+
+                    <ul class="navbar-nav">
+                            <partial name="_loginPartial">
+                       
+                       
+                       
                     </ul>
                 </div>
             </div>

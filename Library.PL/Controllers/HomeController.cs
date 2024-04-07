@@ -25,25 +25,8 @@ namespace Library.PL.Controllers
             _bookService = bookService;
         }
 
-        [HttpPost, ActionName("Borrow")]
-        [ValidateAntiForgeryToken]
-        public IActionResult Borrow(int bookId)
-        {
-            var userId = HttpContext.Session.GetInt32("userId").Value;
-            if (userId == null)
-            {
-                return NotFound();
-            }
-            if (bookId != null)
-            {
-                if (_bookService.BorrowBook(userId, bookId) == true)
-                    return View();
-
-            }
-
-            return View();
-        }
-        [HttpGet()]
+        
+        [HttpGet]
         public IActionResult Index(string? query)
         {
             if (query is null)
@@ -72,20 +55,24 @@ namespace Library.PL.Controllers
             return View(book);
         }
 
+        [HttpPost, ActionName("Borrow")]
+        [ValidateAntiForgeryToken]
+        public IActionResult Borrow(int bookId)
+        {
+            var userId = HttpContext.Session.GetInt32("userId").Value;
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            if (bookId != null)
+            {
+                if (_bookService.BorrowBook(userId, bookId) == true)
+                    return View();
 
+            }
 
-
-
-
-
-
-        //public IActionResult Index(int id)
-        //{
-        //    var loggedInUserId = HttpContext.Session.GetInt32("userId");
-        //     _userRepo.DeleteRecord("Users", loggedInUserId.Value);
-        //    Console.WriteLine();
-        //    return View();
-        //}
+            return View();
+        }
 
         public IActionResult Privacy()
         {
