@@ -1,0 +1,64 @@
+﻿@model Library.DAL.Entities.Books
+@using Library_Utility;
+
+ asp-controller="Home" asp-action="Details" 
+<div class="">
+    <form method="post" >
+        <input asp-for="@Model.BookId" hidden />
+        <div class="container backgroundWhite pt-4">
+            <div class="card" style="border:1px solid #000000; ">
+                <div class="card-header bg-dark text-light ml-0 row container" style="border-radius: 0px;">
+                    <div class="col-12 col-md-6">
+                        <h1 class="text-white">TITLE :@Model.Title</h1>
+                    </div>
+                    <div class="col-12 col-md-6 text-md-right">
+                        <h1 class="text-white">AUTHOR @Model.Author</h1>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="container rounded p-2">
+                        <div class="row">
+                            <div class="col-12 col-lg-4 p-1 text-center">
+                                <img src="@GlobalConst.ImagePath@Model.Image" width="100%" class="rounded" />
+                            </div>
+                            <div class="col-12 col-lg-8">
+                                <div class="row pl-3">
+
+                                    <div class="col-12">
+                                        <span class="badge p-3 border" style="background-color:lavenderblush;color:black;">Genra: @Model.Genre</span>
+                                        <span class="badge p-3 border" style="background-color:azure;color:black;">ISBN: @Model.ISBN</span>
+                                        <h3 class="text-success"></h3>
+
+                                        <p class="text-secondary">
+                                            Embark on a journey through the boundless realms of imagination and knowledge
+                                            , where every page is a gateway to new worlds waiting to be explored.
+                                            In the embrace of a book, you'll find solace, inspiration, 
+                                            and wisdom woven into every sentence. Let the words dance before your eyes,
+                                            igniting the spark of curiosity within you. For in the pages of a book, 
+                                            you'll uncover the treasures of centuries past and the dreams of tomorrow. 
+                                            So, embrace the magic of reading, for within its grasp lies the power to transform,
+                                            enlighten, and enrich your life in ways you never thought possible.
+                                        </p>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-dark">
+                    <div class="row">
+                        <div class="col-12 col-md-6 pb-1 ">
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-success btn-square form-control btn-lg" style="height:50px;">Back to List</a>
+                        </div>
+                        <div class="col-12 col-md-6 ">
+
+                            <button asp-controller="Books" asp-action="BorrowBook" type="submit" class="btn btn-info form-control btn-lg" style="height:50px;">Borrow</button>
+            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

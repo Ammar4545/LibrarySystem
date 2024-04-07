@@ -3,8 +3,11 @@ using Library.DAL.Entities;
 using Library.DAL.Repositories.Interface;
 using Library.PL.Models;
 using Library.PL.ViewModel;
+using Library_Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.FlowAnalysis;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 using System.Diagnostics;
 using static System.Reflection.Metadata.BlobBuilder;
 
@@ -62,9 +65,11 @@ namespace Library.PL.Controllers
 
             
         }
-        public IActionResult Search(string? query)
+        public IActionResult Details(int id)
         {
-            return View();
+            var book = _bookService.GetById("Books", id);
+
+            return View(book);
         }
 
 

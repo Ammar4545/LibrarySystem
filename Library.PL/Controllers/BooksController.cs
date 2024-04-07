@@ -170,7 +170,24 @@ namespace Library.PL.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-        public IActionResult BorrowBook()
+        [HttpPost]
+        public IActionResult BorrowBook(int? bookId)
+        {
+            var loggedInUser=HttpContext.Session.GetInt32("userId").Value;
+            if (loggedInUser==null)
+            {
+                return NotFound();
+            }
+            if (bookId == null)
+            {
+                return NotFound();
+            }
+            if(_bookService.BorrowBook(loggedInUser, bookId.Value))
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            return RedirectToAction("Index", "Home");
+        }
         
         private bool BooksExists(int id)
         {
