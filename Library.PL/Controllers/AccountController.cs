@@ -1,4 +1,5 @@
-﻿using Library.DAL.Entities;
+﻿using Library.BLL.Services.Contracts;
+using Library.DAL.Entities;
 using Library.DAL.Repositories.Interface;
 using Library.PL.ViewModel;
 using Microsoft.AspNetCore.Mvc;
@@ -8,33 +9,36 @@ namespace Library.PL.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly IAuthRepository _authRepo;
-        private readonly IUserRepository _userRepo;
+        private readonly IAuthService _authService;
+        private readonly IUserService _userService;
 
-        public AccountController(IAuthRepository authRepo,IUserRepository userRepo)
+        public AccountController(IAuthService authService, IUserService userService)
         {
-            _authRepo = authRepo;
-            _userRepo=userRepo;
+            _authService = authService;
+            _userService = userService;
         }
-        public IActionResult Index(string usrName,string password )
-        {
-            //http://localhost:5195/account/index?usrname=hossam&password=123456
 
-            if (_authRepo.CheckUserExists(usrName, password))
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(LoginViewModel model)
+        {
+            if (_authService.CheckUserExists(model.UserName, model.Password))
             {
 
-                var user = _authRepo.CheckUser(usrName, password);
+                var user = _authService.CheckUser(model.UserName, model.Password);
 
                 if (user != null)
-                {
-                    HttpContext.Session.SetString("userName", user.UserName);
-                    HttpContext.Session.SetInt32("userId", user.UserId);
-                    return View();
-                    //return RedirectToAction("Index", "Home");
+				{
+					HttpContext.Session.SetString("userName", user.UserName);
+					HttpContext.Session.SetInt32("userId", user.UserId);
+					return RedirectToAction("Index", "Home");
                 }
             }
-
-
             return View();
         }
         public IActionResult Logout()

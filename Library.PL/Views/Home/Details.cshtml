@@ -49,11 +49,13 @@
                 <div class="card-footer bg-dark">
                     <div class="row">
                         <div class="col-12 col-md-6 pb-1 ">
-                            <a asp-controller="Home" asp-action="Index" class="btn btn-success btn-square form-control btn-lg" style="height:50px;">Back to List</a>
+                            <a asp-controller="Home" asp-action="Index" class="btn btn-success btn-square form-control btn-lg"
+                            style="height:50px;">Back to List</a>
                         </div>
                         <div class="col-12 col-md-6 ">
 
-                            <button asp-controller="Books" asp-action="BorrowBook" type="submit" class="btn btn-info form-control btn-lg" style="height:50px;">Borrow</button>
+                            <button id="borrowButton" asp-controller="Books" asp-action="BorrowBook"
+                            type="submit" class="btn btn-info form-control btn-lg" style="height:50px;">Borrow</button>
             
                         </div>
                     </div>
@@ -62,3 +64,27 @@
         </div>
     </form>
 </div>
+<script>
+    document.getElementById("borrowButton").addEventListener("click", function () {
+        // Make AJAX request to BorrowBook action
+        fetch('/Books/BorrowBook', {
+            method: 'POST', // or 'GET' depending on your action method
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ /* Add any data you want to send */ })
+        })
+            .then(response => response.json())
+            .then(data => {
+                // Check return value and show appropriate alert
+                if (data) {
+                    alert("Borrowed completed!");
+                } else {
+                    alert("There are no books available.");
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    });
+</script>
