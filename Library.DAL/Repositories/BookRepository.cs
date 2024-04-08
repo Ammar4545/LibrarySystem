@@ -20,41 +20,146 @@ namespace Library.DAL.Repositories
         {
             _connection = connection.Value;
         }
-        public bool BorrowBook(int userId,int bookId)
+        //public bool BorrowBook(int userId,int bookId)
+        //{
+
+        //    using (var connection = new SqlConnection(_connection.SQLString))
+        //    {
+        //        connection.Open();
+        //        using (var transaction = connection.BeginTransaction())
+        //        {
+        //            using (var command = connection.CreateCommand())
+        //            {
+        //                command.Transaction = transaction;
+
+        //                try
+        //                {
+        //                    // Check if there are available copies
+        //                    command.CommandText = "SELECT AvailableCopies FROM Books WHERE BookId = @BookId";
+        //                    command.Parameters.AddWithValue("@BookId", bookId);
+
+        //                    int availableCopies = (int)command.ExecuteScalar();
+
+        //                    if (availableCopies > 0)
+        //                    {
+        //                        // Insert a record into Borrowings
+        //                        command.CommandText = "INSERT INTO Borrowings (UserId, BookId, BorrowDate) VALUES (@UserId, @BookId, GETDATE())";
+        //                        command.Parameters.AddWithValue("@UserId", userId);
+
+        //                        command.ExecuteNonQuery();
+
+        //                        // Decrease AvailableCopies by 1
+        //                        command.CommandText = "UPDATE Books SET AvailableCopies = AvailableCopies - 1 WHERE BookId = @BookId";
+
+        //                        command.ExecuteNonQuery();
+
+        //                        transaction.Commit();
+        //                        return true;
+        //                    }
+        //                    else
+        //                    {
+        //                        transaction.Rollback();
+        //                        return false; // No copies available
+        //                    }
+        //                }
+        //                catch
+        //                {
+        //                    transaction.Rollback();
+        //                    throw;
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+        //public bool ReturnBook(int userId, int bookId)
+        //{
+
+        //    using (var connection = new SqlConnection(_connection.SQLString))
+        //    {
+        //        connection.Open();
+        //        using (var transaction = connection.BeginTransaction())
+        //        {
+        //            using (var command = connection.CreateCommand())
+        //            {
+        //                command.Transaction = transaction;
+
+        //                try
+        //                {
+        //                    // Update Borrowings to set ReturnDate for the book
+        //                    command.CommandText = "UPDATE Borrowings SET ReturnDate " +
+        //                        "= GETDATE() WHERE UserId = @UserId AND BookId = @BookId AND ReturnDate IS NULL";
+        //                    command.Parameters.AddWithValue("@UserId", userId);
+        //                    command.Parameters.AddWithValue("@BookId", bookId);
+
+        //                    int rowsAffected = command.ExecuteNonQuery();
+
+        //                    if (rowsAffected > 0)
+        //                    {
+        //                        // Increase AvailableCopies by 1
+        //                        command.CommandText = "UPDATE Books SET AvailableCopies = AvailableCopies + 1 WHERE BookId = @BookId";
+
+        //                        command.ExecuteNonQuery();
+
+        //                        transaction.Commit();
+        //                        return true;
+        //                    }
+        //                    else
+        //                    {
+        //                        transaction.Rollback();
+        //                        return false; // No matching borrowing record found
+        //                    }
+        //                }
+        //                catch
+        //                {
+        //                    transaction.Rollback();
+        //                    throw;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //}
+        public bool BorrowBook(int userId, int bookId)
         {
-            
             using (var connection = new SqlConnection(_connection.SQLString))
             {
                 connection.Open();
                 using (var transaction = connection.BeginTransaction())
                 {
-                    using (var command = connection.CreateCommand())
+                    try
                     {
-                        command.Transaction = transaction;
-
-                        try
+                        using (var command = connection.CreateCommand())
                         {
-                            // Check if there are available copies
-                            command.CommandText = "SELECT AvailableCopies FROM Books WHERE BookId = @BookId";
+                            command.Transaction = transaction;
+
+                            // Check if there are available copies and insert a record into Borrowings
+                            command.CommandText = @"
+                        IF EXISTS (SELECT 1 FROM Books WHERE BookId = @BookId AND AvailableCopies > 0)
+                        BEGIN
+                            INSERT INTO Borrowings (UserId, BookId, BorrowDate)
+                            VALUES (@UserId, @BookId, GETDATE());
+
+                            UPDATE Books
+                            SET AvailableCopies = AvailableCopies - 1
+                            WHERE BookId = @BookId;
+
+                            SELECT 1; -- Indicate success
+                        END
+                        ELSE
+                        BEGIN
+                            SELECT 0; -- Indicate failure
+                        END";
                             command.Parameters.AddWithValue("@BookId", bookId);
+                            command.Parameters.AddWithValue("@UserId", userId);
 
-                            int availableCopies = (int)command.ExecuteScalar();
+                            // Execute the command and get the result
+                            int result = (int)command.ExecuteScalar();
 
-                            if (availableCopies > 0)
+                            // Commit or rollback transaction based on the result
+                            if (result == 1)
                             {
-                                // Insert a record into Borrowings
-                                command.CommandText = "INSERT INTO Borrowings (UserId, BookId, BorrowDate) VALUES (@UserId, @BookId, GETDATE())";
-                                command.Parameters.AddWithValue("@UserId", userId);
-
-                                command.ExecuteNonQuery();
-
-                                // Decrease AvailableCopies by 1
-                                command.CommandText = "UPDATE Books SET AvailableCopies = AvailableCopies - 1 WHERE BookId = @BookId";
-
-                                command.ExecuteNonQuery();
-
                                 transaction.Commit();
-                                return true;
+                                return true; // Borrowing successful
                             }
                             else
                             {
@@ -62,11 +167,11 @@ namespace Library.DAL.Repositories
                                 return false; // No copies available
                             }
                         }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
                     }
                 }
             }
