@@ -32,17 +32,15 @@
                         @if (httpContextAccessor.HttpContext.Session.GetString("userName") == "admin")
                          {
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                Library Management
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li class="nav-item ">
+                           
+                            
                                 <a class="nav-link text-dark dropdown-item" asp-area="" asp-controller="Books" asp-action="Index">Books</a>
+                               
+                               
+                          </li>
+                          <li>
                                 <a class="nav-link text-dark dropdown-item" asp-area="" asp-controller="Users" asp-action="Index"> Users </a>
-                                <div class="dropdown-divider"></div>
-                                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Create Admin User</a>
-                                 </div>
                           </li>
                         }
                     </ul> 
