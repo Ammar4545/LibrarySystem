@@ -1,7 +1,7 @@
-﻿@model Library.PL.ViewModel.BooksVM
+﻿@model Library.DAL.Entities.Books
 @inject IHttpContextAccessor httpContextAccessor;
 
- @if (TempData["Message"] != null)
+@if (TempData["Message"] != null)
 {
     @*     <div class="alert alert-danger">
         <p>@TempData["Message"]</p>
@@ -12,7 +12,7 @@
             alert('@TempData["Message"]');
         };
     </script>
-} 
+}
 
 <div class="container">
     <div class="text-center">
@@ -26,11 +26,11 @@
                 </div>
             </form>
         }
-       
+
     </div>
     <br />
     <div class="row">
-        @foreach (var item in Model.Books)
+        @foreach (var item in Model)
         {
             <partial name="_BookItems" model="item"></partial>
         }

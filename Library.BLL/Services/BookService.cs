@@ -40,9 +40,9 @@ namespace Library.BLL.Services
             return _bookRepo.GetAll(tableName);
         }
 
-        public List<BorrowedBook> GetBorrowedBooksByUser(string userName)
+        public List<Books> GetBorrowedBooksByUser(int userId)
         {
-            return _bookRepo.GetBorrowedBooksByUser(userName);
+            return _bookRepo.GetBorrowedBooksByUser(userId);
         }
 
         public Books GetById(string tableName, int? id)

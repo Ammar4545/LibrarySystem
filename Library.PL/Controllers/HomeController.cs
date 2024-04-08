@@ -59,22 +59,44 @@ namespace Library.PL.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Borrow(int bookId)
         {
-            var userId = HttpContext.Session.GetInt32("userId").Value;
-            if (userId == null)
+            var userId = HttpContext.Session.GetInt32("userId");
+            try
             {
-                return NotFound();
+                if (_bookService.BorrowBook(userId.Value, bookId)==true)
+                {
+                    TempData["Message"] = "Book Borrowing Successfuly";
+                    return RedirectToAction("Index", "Home");
+                }
+                TempData["Message"] = "Erorr During Borrowing";
+                return RedirectToAction("Index", "Home");
             }
-            if (bookId != null)
+            catch (Exception)
             {
-                if (_bookService.BorrowBook(userId, bookId) == true)
-                    return View();
-
+                TempData["Message"] = "Erorr During Borrowing";
+                return RedirectToAction("Index", "Home");
             }
+        }
 
+
+        [HttpGet]
+        public IActionResult AllBooksForUser()
+        {
+            var userId = HttpContext.Session.GetInt32("userId");
+            var borrowedBooks = _bookService.GetBorrowedBooksByUser(userId.Value);
+            return View(borrowedBooks);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult GetBooksForUser(int bookId)
+        {
+            var userName = HttpContext.Session.GetString("userName");
+            var borrowedBooks = _bookService.GetBorrowedBooksByUser(userName);
             return View();
         }
 
-        public IActionResult Privacy()
+
+            public IActionResult Privacy()
         {
             return View();
         }

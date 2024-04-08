@@ -119,40 +119,46 @@ namespace Library.DAL.Repositories
             }
 
         }
-        public List<BorrowedBook> GetBorrowedBooksByUser(string userName)
+        public List<Books> GetBorrowedBooksByUser(int userId)
         {
-            var borrowedBooks = new List<BorrowedBook>();
-
-            string query = @"
-                SELECT b.Title, b.Author, br.BorrowDate, br.ReturnDate
-                FROM Borrowings br
-                JOIN Books b ON br.BookId = b.BookId
-                JOIN Users u ON br.UserId = u.UserId
-                WHERE u.UserName = @UserName;";
+            List<Books> books = new List<Books>();
 
             using (var connection = new SqlConnection(_connection.SQLString))
-            using (var command = new SqlCommand(query, connection))
             {
-                command.Parameters.AddWithValue("@UserName", userName);
-
                 connection.Open();
-                using (var reader = command.ExecuteReader())
+
+                string sql = @"
+                    SELECT Books.*
+                    FROM Books
+                    INNER JOIN UserBooks ON Books.BookId = UserBooks.BookId
+                    WHERE UserBooks.UserId = @UserId";
+
+                using (var command = new SqlCommand(sql, connection))
                 {
-                    while (reader.Read())
+                    command.Parameters.AddWithValue("@UserId", userId);
+
+                    using (var reader = command.ExecuteReader())
                     {
-                        var book = new BorrowedBook
+                        while (reader.Read())
                         {
-                            Title = reader["Title"].ToString(),
-                            Author = reader["Author"].ToString(),
-                            BorrowDate = (DateTime)reader["BorrowDate"],
-                            ReturnDate = reader["ReturnDate"] as DateTime?
-                        };
-                        borrowedBooks.Add(book);
+                            // Populate Book object from reader and add it to the list
+                            Books book = new Books
+                            {
+                                BookId = Convert.ToInt32(reader["BookId"]),
+                                Title = reader["Title"].ToString(),
+                                Author = reader["Author"].ToString(),
+                                Genre = reader["Genre"].ToString(),
+                                ISBN = reader["ISBN"].ToString(),
+                                // Populate other properties as needed
+                            };
+
+                            books.Add(book);
+                        }
                     }
                 }
             }
 
-            return borrowedBooks;
+            return books;
         }
         public List<Books> SearchBooksByTitleOrAuthor(string searchQuery)
             {
