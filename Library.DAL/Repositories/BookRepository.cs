@@ -71,53 +71,107 @@ namespace Library.DAL.Repositories
                 }
             }
         }
+        //public bool ReturnBook(int userId, int bookId)
+        //{
+
+        //    using (var connection = new SqlConnection(_connection.SQLString))
+        //    {
+        //        connection.Open();
+        //        using (var transaction = connection.BeginTransaction())
+        //        {
+        //            using (var command = connection.CreateCommand())
+        //            {
+        //                command.Transaction = transaction;
+
+        //                try
+        //                {
+        //                    // Update Borrowings to set ReturnDate for the book
+        //                    command.CommandText = "UPDATE Borrowings SET ReturnDate " +
+        //                        "= GETDATE() WHERE UserId = @UserId AND BookId = @BookId AND ReturnDate IS NULL";
+        //                    command.Parameters.AddWithValue("@UserId", userId);
+        //                    command.Parameters.AddWithValue("@BookId", bookId);
+
+        //                    int rowsAffected = command.ExecuteNonQuery();
+
+        //                    if (rowsAffected > 0)
+        //                    {
+        //                        // Increase AvailableCopies by 1
+        //                        command.CommandText = "UPDATE Books SET AvailableCopies = AvailableCopies + 1 WHERE BookId = @BookId";
+
+        //                        command.ExecuteNonQuery();
+
+        //                        transaction.Commit();
+        //                        return true;
+        //                    }
+        //                    else
+        //                    {
+        //                        transaction.Rollback();
+        //                        return false; // No matching borrowing record found
+        //                    }
+        //                }
+        //                catch
+        //                {
+        //                    transaction.Rollback();
+        //                    throw;
+        //                }
+        //            }
+        //        }
+        //    }
+
+        //}
         public bool ReturnBook(int userId, int bookId)
         {
-
             using (var connection = new SqlConnection(_connection.SQLString))
             {
                 connection.Open();
                 using (var transaction = connection.BeginTransaction())
                 {
-                    using (var command = connection.CreateCommand())
+                    try
                     {
-                        command.Transaction = transaction;
-
-                        try
+                        using (var command = connection.CreateCommand())
                         {
-                            // Update Borrowings to set ReturnDate for the book
-                            command.CommandText = "UPDATE Borrowings SET ReturnDate " +
-                                "= GETDATE() WHERE UserId = @UserId AND BookId = @BookId AND ReturnDate IS NULL";
+                            command.Transaction = transaction;
+
+                            // Update the first matching row in Borrowings to set ReturnDate for the book
+                            command.CommandText = @"
+                                 UPDATE TOP (1) Borrowings
+                                 SET ReturnDate = GETDATE()
+                                 WHERE UserId = @UserId AND BookId = @BookId AND ReturnDate IS NULL;
+                                 
+                                 IF @@ROWCOUNT > 0
+                                 BEGIN
+                                     -- Increase AvailableCopies by 1
+                                     UPDATE Books SET AvailableCopies = AvailableCopies + 1 WHERE BookId = @BookId;
+                                     SELECT 1; -- Indicate success
+                                 END
+                                 ELSE
+                                 BEGIN
+                                     SELECT 0; -- Indicate failure
+                                 END";
                             command.Parameters.AddWithValue("@UserId", userId);
                             command.Parameters.AddWithValue("@BookId", bookId);
 
-                            int rowsAffected = command.ExecuteNonQuery();
+                            int result = (int)command.ExecuteScalar();
 
-                            if (rowsAffected > 0)
+                            if (result == 1)
                             {
-                                // Increase AvailableCopies by 1
-                                command.CommandText = "UPDATE Books SET AvailableCopies = AvailableCopies + 1 WHERE BookId = @BookId";
-
-                                command.ExecuteNonQuery();
-
                                 transaction.Commit();
                                 return true;
                             }
                             else
                             {
                                 transaction.Rollback();
-                                return false; // No matching borrowing record found
+                                return false; // No matching borrowing record found or book already returned
                             }
                         }
-                        catch
-                        {
-                            transaction.Rollback();
-                            throw;
-                        }
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
                     }
                 }
             }
-
         }
         public List<Books> GetBorrowedBooksByUser(int userId)
         {
@@ -130,8 +184,8 @@ namespace Library.DAL.Repositories
                 string sql = @"
                     SELECT Books.*
                     FROM Books
-                    INNER JOIN UserBooks ON Books.BookId = UserBooks.BookId
-                    WHERE UserBooks.UserId = @UserId";
+                    INNER JOIN Borrowings ON Books.BookId = Borrowings.BookId
+                    WHERE Borrowings.UserId = @UserId and Borrowings.ReturnDate IS NULL ";
 
                 using (var command = new SqlCommand(sql, connection))
                 {
@@ -149,6 +203,7 @@ namespace Library.DAL.Repositories
                                 Author = reader["Author"].ToString(),
                                 Genre = reader["Genre"].ToString(),
                                 ISBN = reader["ISBN"].ToString(),
+                                Image = reader["Image"].ToString(),
                                 // Populate other properties as needed
                             };
 

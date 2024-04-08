@@ -28,16 +28,16 @@ namespace Library.PL.Controllers
             }
             return View();
         }
-        public IActionResult GetBorrowedBooksForUser()
-        {
-            var loggedInUserId = HttpContext.Session.GetInt32("userId");
-            var loggedInUserName = HttpContext.Session.GetString("userName");
-            if (loggedInUserId != null)
-            {
-                var book =_bookService.GetBorrowedBooksByUser(loggedInUserName);
-            }
-            return View();
-        }
+        //public IActionResult GetBorrowedBooksForUser()
+        //{
+        //    var loggedInUserId = HttpContext.Session.GetInt32("userId");
+        //    var loggedInUserName = HttpContext.Session.GetString("userName");
+        //    if (loggedInUserId != null)
+        //    {
+        //        var book =_bookService.GetBorrowedBooksByUser(loggedInUserName);
+        //    }
+        //    return View();
+        //}
 
         public IActionResult Search(string query)
         {

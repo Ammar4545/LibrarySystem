@@ -82,21 +82,45 @@ namespace Library.PL.Controllers
         public IActionResult AllBooksForUser()
         {
             var userId = HttpContext.Session.GetInt32("userId");
-            var borrowedBooks = _bookService.GetBorrowedBooksByUser(userId.Value);
-            return View(borrowedBooks);
+            var BorrowedBooksForUser = _bookService.GetBorrowedBooksByUser(userId.Value);
+            var booksToReturn = new UserBooksVM()
+            {
+                Books = BorrowedBooksForUser,
+            };
+            return View(booksToReturn);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult GetBooksForUser(int bookId)
+        [HttpGet]
+        public IActionResult BorrowedBookDetails(int id)
         {
-            var userName = HttpContext.Session.GetString("userName");
-            var borrowedBooks = _bookService.GetBorrowedBooksByUser(userName);
-            return View();
+            var book = _bookService.GetById("Books", id);
+
+            return View(book);
+        }
+        [HttpPost]
+        public IActionResult ReturnBook(int bookId)
+        {
+            var userId = HttpContext.Session.GetInt32("userId");
+            try
+            {
+                if (_bookService.ReturnBook(userId.Value, bookId) == true)
+                {
+                    TempData["Message"] = "Book Returned Successfuly";
+                    return RedirectToAction("AllBooksForUser", "Home");
+                }
+                TempData["Message"] = "Erorr During Returning";
+                return RedirectToAction("AllBooksForUser", "Home");
+            }
+            catch (Exception)
+            {
+                TempData["Message"] = "Erorr During Returning";
+                return RedirectToAction("AllBooksForUser", "Home");
+            }
         }
 
 
-            public IActionResult Privacy()
+
+
+        public IActionResult Privacy()
         {
             return View();
         }
